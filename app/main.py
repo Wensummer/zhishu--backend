@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import admin, announcements, briefing, copilot, models, workbench
+from app.routers import admin, announcements, billing, briefing, copilot, models, workbench
 
 app = FastAPI(title="智枢 · 选型营销赋能平台 后端", version="0.1.0")
 
@@ -23,6 +23,7 @@ app.include_router(announcements.router)
 app.include_router(briefing.router)
 app.include_router(workbench.router)
 app.include_router(admin.router)
+app.include_router(billing.router)
 app.include_router(copilot.router)
 
 
