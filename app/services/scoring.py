@@ -3,7 +3,7 @@
 简报、四问向导、横评三处共用同一套逻辑,产出可核验证据链。
 Phase 后期数据来源切到天翼云评测台/监控/定价库(改 source 与 collected_at),公式与结构保持不变。
 """
-from app.data.models import blended_price
+from app.repo import models as models_repo
 from app.schemas.evidence import EvidenceChain, EvidenceFactor
 from app.schemas.common import SourceRef
 from app.schemas.model import Model
@@ -23,6 +23,11 @@ COLLECTED = {
 
 def _clamp(v: float, lo: float, hi: float) -> float:
     return min(hi, max(lo, v))
+
+
+def blended_price(model: Model) -> float:
+    """模型加权混合价(元/千 token):输入 0.3 + 输出 0.7。移植 models.ts。"""
+    return model.price_input_per1k * 0.3 + model.price_output_per1k * 0.7
 
 
 def cost_factor(model: Model) -> float:

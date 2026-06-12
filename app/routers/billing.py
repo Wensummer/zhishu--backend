@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Query
 
 from app.schemas.billing import BillingRecord
-from app.data.billing import get_cend_billing_records, get_customer_billing_records
+from app.repo import dashboard as repo
 
 router = APIRouter()
 
@@ -13,14 +13,6 @@ def billing(
     model: str | None = None,
     api_key_name: str | None = Query(None, alias="api_key_name"),
 ) -> list[BillingRecord]:
-    if customer_id:
-        records = get_customer_billing_records(customer_id)
-    else:
-        records = get_cend_billing_records()
-
-    if model:
-        records = [r for r in records if r.model == model]
-    if api_key_name:
-        records = [r for r in records if r.api_key_name == api_key_name]
-
-    return records
+    return repo.get_billing_records(
+        customer_id=customer_id, model=model, api_key_name=api_key_name
+    )

@@ -10,6 +10,9 @@ __pycache__/
 venv/
 env/
 
+# SQLite 数据文件(首次启动自动生成)
+data_store/
+
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/

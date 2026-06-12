@@ -14,3 +14,4 @@ class BillingRecord(CamelModel):
     amount: float
     unit_price: float
     billing_mode: str
+    customer_id: str | None = None

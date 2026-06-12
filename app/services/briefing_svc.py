@@ -6,8 +6,8 @@
 
 Phase 后期:推荐/话术来源切到 RAG + 天翼云模型,Briefing 形状不变。
 """
-from app.data.customers import Customer, get_customer_by_id
-from app.data.models import get_model_by_name
+from app.repo import customers as customers_repo
+from app.repo import models as models_repo
 from app.schemas.briefing import Briefing, BriefingCustomer
 from app.schemas.common import TimeSeriesPoint
 from app.schemas.evidence import EvidenceChain, EvidenceFactor
@@ -199,12 +199,12 @@ def get_briefing(customer_id: str) -> Briefing:
     if customer_id in CURATED:
         return CURATED[customer_id]
 
-    customer = get_customer_by_id(customer_id)
+    customer = customers_repo.get_by_id(customer_id)
     # 新客无用量/无当前模型,或未命中 → 回退招牌客户(对齐前端 ?? 兜底)
     if customer is None or customer.is_new or not customer.current_model_id:
         return BRIEFING_C1024
 
-    model = get_model_by_name(customer.current_model_id)
+    model = models_repo.get_by_name(customer.current_model_id)
     if model is None:
         return BRIEFING_C1024
 
