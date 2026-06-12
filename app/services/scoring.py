@@ -3,7 +3,7 @@
 简报、四问向导、横评三处共用同一套逻辑,产出可核验证据链。
 Phase 后期数据来源切到天翼云评测台/监控/定价库(改 source 与 collected_at),公式与结构保持不变。
 """
-from app.data.models import blended_price
+from app.data.models import blended_price, task_score
 from app.schemas.evidence import EvidenceChain, EvidenceFactor
 from app.schemas.common import SourceRef
 from app.schemas.model import Model
@@ -73,3 +73,44 @@ def score_model(model: Model) -> EvidenceChain:
     score = round(model.capability_score * model.availability * cf, 1)
 
     return EvidenceChain(formula=SCORE_FORMULA, score=score, factors=factors)
+
+
+def score_model_for_task(model: Model, task: str) -> EvidenceChain:
+    """按「具体任务维度」算综合分(智能选型用)。
+
+    与 score_model 同一公式,只是能力分取该任务的分(代码/数学/长文本…),
+    而非笼统总分。这样推荐才对得上客户的真实需求,且证据链点明用的是哪个任务的评测分。
+    """
+    cap = task_score(model, task)
+    cf = cost_factor(model)
+
+    factors = [
+        EvidenceFactor(
+            key="capability",
+            label=f"{task}能力分",
+            value=cap,
+            display=str(int(cap)) if cap == int(cap) else str(cap),
+            source=SourceRef(
+                label=f"选型评测台 · {task}任务集(C-Eval/SuperCLUE)",
+                collected_at=COLLECTED["capability"],
+            ),
+        ),
+        EvidenceFactor(
+            key="availability",
+            label="可用率",
+            value=model.availability,
+            display=f"{model.availability * 100:.1f}%",
+            source=SourceRef(label="可用性监控 · 30 天滚动", collected_at=COLLECTED["availability"]),
+        ),
+        EvidenceFactor(
+            key="costFactor",
+            label="成本系数",
+            value=cf,
+            display=f"×{cf:.2f}",
+            source=SourceRef(label="定价知识库 · 混合价基准", collected_at=COLLECTED["cost"]),
+        ),
+    ]
+    score = round(cap * model.availability * cf, 1)
+    return EvidenceChain(
+        formula=f"综合分 = {task}能力 × 可用率 × 成本系数", score=score, factors=factors
+    )

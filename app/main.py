@@ -14,7 +14,7 @@ app = FastAPI(title="智枢 · 选型营销赋能平台 后端", version="0.1.0"
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 

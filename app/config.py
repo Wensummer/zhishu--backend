@@ -17,6 +17,8 @@ class Settings:
     # 天翼云已备案模型 key —— 仅服务端使用,详见 integrations/tianyi.py
     tianyi_api_key: str = os.getenv("TIANYI_API_KEY", "")
     tianyi_base_url: str = os.getenv("TIANYI_BASE_URL", "")
+    # 实时意图识别用的 LLM key(当前用 DeepSeek;生产可换天翼云已备案模型)
+    deepseek_api_key: str = os.getenv("DEEPSEEK_API_KEY", "")
 
 
 settings = Settings()

@@ -1,0 +1,6 @@
+creds.py
+.venv/
+*.wav
+__pycache__/
+*.m4a
+test16k.wav

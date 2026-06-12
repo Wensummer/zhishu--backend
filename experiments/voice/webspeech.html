@@ -1,0 +1,94 @@
+<!doctype html>
+<!--
+  Web Speech API 实时转写体感 demo(一次性实验,非生产方案)。
+  打开方式:用 Chrome 打开本文件(file:// 即可),点「开始」,对着麦克风说话。
+  说明:Chrome 会把音频发到谷歌识别 —— 仅用于看实时手感,正式项目用讯飞(数据不出境)。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>实时转写体感 · Web Speech API</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 760px;
+         margin: 40px auto; padding: 0 20px; color: #1a1a1a; }
+  h1 { font-size: 20px; }
+  .hint { color: #888; font-size: 13px; line-height: 1.6; }
+  button { font-size: 16px; padding: 10px 22px; border-radius: 8px; border: none;
+           cursor: pointer; color: #fff; background: #2563eb; }
+  button.stop { background: #dc2626; }
+  #status { margin-left: 12px; font-size: 14px; color: #666; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+         background: #ccc; margin-right: 6px; vertical-align: middle; }
+  .dot.live { background: #16a34a; animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: .3; } }
+  #out { margin-top: 24px; min-height: 240px; border: 1px solid #e5e7eb;
+         border-radius: 10px; padding: 18px; font-size: 18px; line-height: 1.9; }
+  .final { color: #111; }
+  .interim { color: #9ca3af; font-style: italic; }  /* 还没定稿的灰色 */
+</style>
+</head>
+<body>
+  <h1>🎙️ 实时转写体感(Web Speech API)</h1>
+  <p class="hint">
+    用 <b>Chrome</b> 打开 → 点「开始」→ 允许麦克风 → 对着说话。<br>
+    灰色斜体 = 实时中间结果(会被覆盖);黑色 = 定稿。
+  </p>
+  <button id="btn">开始</button>
+  <span id="status"><span class="dot" id="dot"></span>未开始</span>
+  <div id="out"></div>
+
+<script>
+const btn = document.getElementById('btn');
+const out = document.getElementById('out');
+const statusEl = document.getElementById('status');
+const dot = document.getElementById('dot');
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) {
+  out.innerHTML = '❌ 这个浏览器不支持 Web Speech API,请用 Chrome 或 Edge。';
+  btn.disabled = true;
+}
+
+let recog = null;
+let listening = false;
+let finalText = '';   // 已定稿的全文
+
+function setStatus(text, live) {
+  statusEl.innerHTML = `<span class="dot ${live ? 'live' : ''}"></span>${text}`;
+}
+
+function start() {
+  recog = new SR();
+  recog.lang = 'zh-CN';
+  recog.continuous = true;       // 持续听,不说完一句就停
+  recog.interimResults = true;   // 要中间结果,才能边说边出字
+
+  recog.onstart = () => { listening = true; setStatus('听音中…', true); btn.textContent = '停止'; btn.className = 'stop'; };
+
+  recog.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalText += t;   // 定稿,累加
+      else interim += t;                          // 中间结果,临时显示
+    }
+    out.innerHTML = `<span class="final">${finalText}</span><span class="interim">${interim}</span>`;
+  };
+
+  recog.onerror = (e) => { setStatus('出错:' + e.error, false); };
+
+  // 连续模式下静音久了 Chrome 也可能自动停 —— 只要还想听,就自动重启
+  recog.onend = () => { if (listening) recog.start(); else { setStatus('已停止', false); btn.textContent = '开始'; btn.className = ''; } };
+
+  recog.start();
+}
+
+function stop() {
+  listening = false;
+  if (recog) recog.stop();
+}
+
+btn.onclick = () => { listening ? stop() : start(); };
+</script>
+</body>
+</html>
