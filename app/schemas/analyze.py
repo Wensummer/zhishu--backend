@@ -17,4 +17,16 @@ class AnalyzeRequest(CamelModel):
 class AnalyzeResponse(CamelModel):
     intent: IntentEvent                          # 识别出的意图
     recommendation: Recommendation | None = None  # 命中商机才有
-    script: TalkScript | None = None              # 命中异议场景才有
+    script: TalkScript | None = None              # 话术已改异步(见 ScriptRequest),analyze 不再返回
+    need: dict | None = None                      # 抽出的结构化需求(task/scale/priceSensitive),供前端查 Dify 场景
+
+
+class ScriptRequest(CamelModel):
+    """POST /copilot/script —— 每轮客户发言后,前端异步来取"给销售的话术"。"""
+    text: str                            # 客户这一轮说的话
+    context: str | None = None           # 最近几轮对话
+    need_type: str | None = None         # 意图类型(决定话术场景)
+    note: str | None = None              # 意图提示(客户当前的具体顾虑)
+    target_model_id: str | None = None   # 推荐的模型名(可空:纯异议应对时无新模型)
+    reason: str | None = None            # 推荐理由
+    score: float = 0                     # 综合分

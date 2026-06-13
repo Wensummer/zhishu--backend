@@ -108,3 +108,15 @@ TASK_SCORES: dict[str, dict[str, float]] = {
 def task_score(m: Model, task: str) -> float:
     """取模型在某任务上的能力分;查不到则兜底用总分。"""
     return TASK_SCORES.get(m.id, {}).get(task, m.capability_score)
+
+
+# ── 生命周期状态(选型库 #1 的"上下架/备案状态")────────────────────────
+# 占位数据,接组员选型库后替换。active=在用 / deprecating=即将下线 / retired=已下线。
+# 选型引擎据此跳过将下线/已下线的模型,从源头避免推一个快停的模型。
+MODEL_STATUS: dict[str, str] = {
+    "deepseek-r1": "deprecating",  # 知识库标注:DeepSeek-R1 即将 5.20 下线
+}
+
+
+def model_status(m: Model) -> str:
+    return MODEL_STATUS.get(m.id, "active")

@@ -52,7 +52,6 @@ FEW_SHOT = [
 _LEVELS = {"high", "medium", "low"}
 # 复用 c-1024 简报里已成形的推荐/话术(含完整证据链)做触发目标
 _RECS = SESSION_C1024.recommendations   # r-1 包年锁价续约 / r-2 质检增值包
-_SCRIPTS = SESSION_C1024.scripts        # s-3 应对比价异议
 
 
 def _call_llm(text: str, context: str | None) -> str:
@@ -85,15 +84,14 @@ def _parse(raw: str) -> dict:
 
 def analyze(
     text: str, context: str | None = None
-) -> tuple[IntentEvent, Recommendation | None, TalkScript | None]:
-    """文本 → 意图 + 触发的推荐/话术。"""
+) -> tuple[IntentEvent, Recommendation | None, TalkScript | None, dict | None]:
+    """文本 → 意图 + 触发的推荐/话术 + 抽出的结构化需求(供前端查 Dify)。"""
     data = _parse(_call_llm(text, context))
     level = data.get("level") if data.get("level") in _LEVELS else "medium"
     need_type = data.get("needType", "无明显意图")
     intent = IntentEvent(at_sec=0, level=level, need_type=need_type, note=data.get("note"))
 
     rec: Recommendation | None = None
-    script: TalkScript | None = None
 
     need_profile = data.get("need")
     if isinstance(need_profile, dict) and need_profile.get("task"):
@@ -101,9 +99,9 @@ def analyze(
         rec = recommend_for_need(need_profile)
     elif need_type in ("价格异议", "成本敏感"):
         rec = _RECS.get("r-1")           # 包年锁价续约,正面回应预算/价格顾虑
-        if need_type == "价格异议":
-            script = _SCRIPTS.get("s-3")  # 应对比价异议话术
     elif need_type == "质量顾虑":
         rec = _RECS.get("r-2")           # 质检增值包(仅当客户确实提到质量/质检时)
 
-    return intent, rec, script
+    # 话术改为异步生成(前端拿到推荐后调 POST /copilot/script),analyze 保持快速响应
+    need = need_profile if isinstance(need_profile, dict) else None
+    return intent, rec, None, need

@@ -3,7 +3,7 @@
 简报、四问向导、横评三处共用同一套逻辑,产出可核验证据链。
 Phase 后期数据来源切到天翼云评测台/监控/定价库(改 source 与 collected_at),公式与结构保持不变。
 """
-from app.repo import models as models_repo
+from app.data.models import task_score
 from app.schemas.evidence import EvidenceChain, EvidenceFactor
 from app.schemas.common import SourceRef
 from app.schemas.model import Model

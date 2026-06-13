@@ -18,7 +18,7 @@ import creds
 
 ENDPOINT = "https://api.deepseek.com/chat/completions"
 MODEL = "deepseek-chat"   # 要更快可换 deepseek 的轻量档;Qwen 通了可换 qwen-turbo
-API_KEY = creds.DEEPSEEK_API_KEY
+API_KEY = creds.D_API_KEY
 
 SYSTEM_PROMPT = """你是销售通话的实时意图识别助手。客户会说一整段话(可能夹杂闲聊、口头禅、题外话),你要识别其中的核心商机意图。
 

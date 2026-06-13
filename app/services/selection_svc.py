@@ -7,7 +7,7 @@
   - 选型库 #1 → 替换 data/models.py 的 TASK_SCORES;
   - 定价库 #2 → 替换下面的报价估算,改用真实套餐价 + 议价区间。
 """
-from app.data.models import ALL_TASKS, MODELS, blended_price
+from app.data.models import ALL_TASKS, MODELS, blended_price, model_status
 from app.schemas.recommendation import Recommendation
 from app.services.scoring import cost_factor, score_model_for_task
 
@@ -32,12 +32,21 @@ def _norm_task(task: str) -> str:
     return TASK_ALIASES.get(t, TASK_ALIASES.get(task, "通用对话"))
 
 
+def _selectable():
+    """可推荐的候选:优先只在「在用」模型里选;若该状态下没有,退而求其次取非「已下线」的。
+    从源头避免推一个即将下线/已下线的模型(知识库的风险检测作为第二道保险)。"""
+    active = [m for m in MODELS if model_status(m) == "active"]
+    if active:
+        return active
+    return [m for m in MODELS if model_status(m) != "retired"]
+
+
 def recommend_for_need(need: dict) -> Recommendation | None:
     """根据结构化需求,从模型池选出最合适的模型并产出推荐(含证据链)。"""
     task = _norm_task(need.get("task", ""))
 
-    # 按该任务维度给每个模型算综合分,选最高的
-    best = max(MODELS, key=lambda m: score_model_for_task(m, task).score)
+    # 在「可推荐」的模型里按该任务维度算综合分,选最高的(已排除即将/已下线)
+    best = max(_selectable(), key=lambda m: score_model_for_task(m, task).score)
     chain = score_model_for_task(best, task)
 
     # 报价估算(占位,待接定价库 #2)
