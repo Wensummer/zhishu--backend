@@ -21,19 +21,21 @@ def get_by_id(customer_id: str) -> Customer | None:
 def upsert(customer: Customer) -> None:
     conn = get_connection()
     conn.execute(
-        """INSERT INTO customers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """INSERT INTO customers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
            ON CONFLICT(id) DO UPDATE SET
              name=excluded.name, industry=excluded.industry,
              is_new=excluded.is_new, current_model_id=excluded.current_model_id,
              current_plan_id=excluded.current_plan_id, balance=excluded.balance,
              expire_at=excluded.expire_at, stage=excluded.stage,
              tags=excluded.tags, owner_manager_id=excluded.owner_manager_id,
-             contact=excluded.contact, monthly_spend=excluded.monthly_spend""",
+             contact=excluded.contact, monthly_spend=excluded.monthly_spend,
+             telecom_products=excluded.telecom_products""",
         (customer.id, customer.name, customer.industry, int(customer.is_new),
          customer.current_model_id, customer.current_plan_id,
          customer.balance, customer.expire_at, customer.stage,
          json.dumps(customer.tags, ensure_ascii=False),
-         customer.owner_manager_id, customer.contact, customer.monthly_spend),
+         customer.owner_manager_id, customer.contact, customer.monthly_spend,
+         json.dumps(customer.telecom_products, ensure_ascii=False)),
     )
     conn.commit()
     conn.close()
@@ -55,4 +57,5 @@ def _row_to_customer(r) -> Customer:
         tags=json.loads(r["tags"]),
         owner_manager_id=r["owner_manager_id"], contact=r["contact"],
         monthly_spend=r["monthly_spend"],
+        telecom_products=json.loads(r["telecom_products"]),
     )

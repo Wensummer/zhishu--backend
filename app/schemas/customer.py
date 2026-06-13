@@ -23,6 +23,7 @@ class Customer(CamelModel):
     owner_manager_id: str
     contact: str | None = None
     monthly_spend: float | None = None
+    telecom_products: list[str] = []   # 其他电信业务推荐(名称列表)
 
 
 class FunnelStage(CamelModel):

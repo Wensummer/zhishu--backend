@@ -66,7 +66,8 @@ def init_db() -> None:
             tags            TEXT NOT NULL,
             owner_manager_id TEXT NOT NULL,
             contact         TEXT,
-            monthly_spend   REAL
+            monthly_spend   REAL,
+            telecom_products TEXT NOT NULL DEFAULT '[]'
         );
 
         CREATE TABLE IF NOT EXISTS announcements (
@@ -234,15 +235,15 @@ def _seed(conn: sqlite3.Connection) -> None:
 
     # ---------- 客户 ----------
     customers = [
-        ("c-1024", "云帆智造科技", "智能制造", 0, "通义千问-Max",  "包年企业版",  38000,  "2026-07-15", "renew",  json.dumps(["高活跃", "对延迟敏感"], ensure_ascii=False), "m-01", "周经理", 24800),
-        ("c-1031", "锦书文化传媒", "内容/营销", 0, "DeepSeek-V3",  "按量标准版",  6200,   "2026-06-28", "upgrade", json.dumps(["用量上涨", "可加推 Agent"], ensure_ascii=False), "m-01", "林总", 15600),
-        ("c-1042", "恒生金服数科", "金融科技", 0, "文心一言-4.0", "包年企业版", 120000, "2026-09-30", "expand",  json.dumps(["多部门扩容", "合规要求高"], ensure_ascii=False), "m-01", "吴总监", 86000),
-        ("c-1055", "蓝橙教育",     "在线教育", 0, "智谱 GLM-4",   "按量标准版",  800,    "2026-06-12", "silent",  json.dumps(["用量下滑", "余额不足"], ensure_ascii=False), "m-01", "陈老师", 3200),
-        ("c-2003", "途新出行",     "出行/物流", 1, None, None, None, None, "newLead", json.dumps(["官网咨询", "待画像"], ensure_ascii=False), "m-01", "赵经理", None),
+        ("c-1024", "云帆智造科技", "智能制造", 0, "通义千问-Max",  "包年企业版",  38000,  "2026-07-15", "renew",  json.dumps(["高活跃", "对延迟敏感"], ensure_ascii=False), "m-01", "周经理", 24800, json.dumps(["天翼云专线", "天翼云会议", "天翼云安全·WAF"], ensure_ascii=False)),
+        ("c-1031", "锦书文化传媒", "内容/营销", 0, "DeepSeek-V3",  "按量标准版",  6200,   "2026-06-28", "upgrade", json.dumps(["用量上涨", "可加推 Agent"], ensure_ascii=False), "m-01", "林总", 15600, json.dumps(["天翼云CDN", "天翼云媒体存储", "天翼云安全·DDoS高防"], ensure_ascii=False)),
+        ("c-1042", "恒生金服数科", "金融科技", 0, "文心一言-4.0", "包年企业版", 120000, "2026-09-30", "expand",  json.dumps(["多部门扩容", "合规要求高"], ensure_ascii=False), "m-01", "吴总监", 86000, json.dumps(["天翼云SSL证书", "天翼云容灾备份", "天翼云数据库RDS"], ensure_ascii=False)),
+        ("c-1055", "蓝橙教育",     "在线教育", 0, "智谱 GLM-4",   "按量标准版",  800,    "2026-06-12", "silent",  json.dumps(["用量下滑", "余额不足"], ensure_ascii=False), "m-01", "陈老师", 3200, json.dumps(["天翼云轻量服务器", "天翼云企业邮箱"], ensure_ascii=False)),
+        ("c-2003", "途新出行",     "出行/物流", 1, None, None, None, None, "newLead", json.dumps(["官网咨询", "待画像"], ensure_ascii=False), "m-01", "赵经理", None, json.dumps(["天翼云企业宽带", "天翼云总机"], ensure_ascii=False)),
     ]
     for c in customers:
         conn.execute(
-            "INSERT INTO customers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", c
+            "INSERT INTO customers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", c
         )
 
     # ---------- 公告 ----------

@@ -10,6 +10,15 @@ from app.schemas.recommendation import Recommendation
 from app.schemas.script import TalkScript
 
 
+class TelecomProduct(CamelModel):
+    id: str
+    name: str
+    description: str
+    category: str
+    reason: str
+    estimated_price: str
+
+
 class BriefingCustomer(CamelModel):
     id: str
     name: str
@@ -29,4 +38,5 @@ class Briefing(CamelModel):
     usage: list[TimeSeriesPoint]
     recommendations: list[Recommendation]
     scripts: list[TalkScript]
+    telecom_products: list[TelecomProduct]
     next_actions: list[str]

@@ -11,6 +11,7 @@ CUSTOMERS: list[Customer] = [
         balance=38000, expire_at="2026-07-15", stage="renew",
         tags=["高活跃", "对延迟敏感"], owner_manager_id="m-01",
         contact="周经理", monthly_spend=24800,
+        telecom_products=["天翼云专线", "天翼云会议", "天翼云安全·WAF"],
     ),
     Customer(
         id="c-1031", name="锦书文化传媒", industry="内容/营销", is_new=False,
@@ -18,6 +19,7 @@ CUSTOMERS: list[Customer] = [
         balance=6200, expire_at="2026-06-28", stage="upgrade",
         tags=["用量上涨", "可加推 Agent"], owner_manager_id="m-01",
         contact="林总", monthly_spend=15600,
+        telecom_products=["天翼云CDN", "天翼云媒体存储", "天翼云安全·DDoS高防"],
     ),
     Customer(
         id="c-1042", name="恒生金服数科", industry="金融科技", is_new=False,
@@ -25,6 +27,7 @@ CUSTOMERS: list[Customer] = [
         balance=120000, expire_at="2026-09-30", stage="expand",
         tags=["多部门扩容", "合规要求高"], owner_manager_id="m-01",
         contact="吴总监", monthly_spend=86000,
+        telecom_products=["天翼云SSL证书", "天翼云容灾备份", "天翼云数据库RDS"],
     ),
     Customer(
         id="c-1055", name="蓝橙教育", industry="在线教育", is_new=False,
@@ -32,11 +35,13 @@ CUSTOMERS: list[Customer] = [
         balance=800, expire_at="2026-06-12", stage="silent",
         tags=["用量下滑", "余额不足"], owner_manager_id="m-01",
         contact="陈老师", monthly_spend=3200,
+        telecom_products=["天翼云轻量服务器", "天翼云企业邮箱"],
     ),
     Customer(
         id="c-2003", name="途新出行", industry="出行/物流", is_new=True,
         stage="newLead", tags=["官网咨询", "待画像"], owner_manager_id="m-01",
         contact="赵经理",
+        telecom_products=["天翼云企业宽带", "天翼云总机"],
     ),
 ]
 
