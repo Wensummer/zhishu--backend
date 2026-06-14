@@ -213,12 +213,32 @@ def init_db() -> None:
             updated_at   TEXT NOT NULL
         );
 
+        -- 通话小结(沟通历史 / 跟进时间线)
+        CREATE TABLE IF NOT EXISTS call_summaries (
+            id             TEXT PRIMARY KEY,
+            customer_id    TEXT NOT NULL,
+            created_at     TEXT NOT NULL,
+            demand         TEXT DEFAULT '',
+            intents        TEXT DEFAULT '',
+            recommendation TEXT DEFAULT '',
+            temperature    TEXT DEFAULT '',
+            next_steps     TEXT DEFAULT '[]',
+            scripts        TEXT DEFAULT '[]',
+            turns          TEXT DEFAULT '[]'
+        );
+
         -- 索引
         CREATE INDEX IF NOT EXISTS idx_customer_usage_customer ON customer_usage(customer_id);
         CREATE INDEX IF NOT EXISTS idx_billing_customer ON billing_records(customer_id);
         CREATE INDEX IF NOT EXISTS idx_recommendations_customer ON recommendations(customer_id);
         CREATE INDEX IF NOT EXISTS idx_evidence_customer ON recommendation_evidence(customer_id);
     """)
+
+    # 轻量迁移:老库 call_summaries 补 turns 列(逐轮对话记录)
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(call_summaries)").fetchall()]
+    if "turns" not in cols:
+        conn.execute("ALTER TABLE call_summaries ADD COLUMN turns TEXT DEFAULT '[]'")
+        conn.commit()
 
     # === 种子数据：仅在空库时写入 ===
     row = conn.execute("SELECT COUNT(*) AS cnt FROM models").fetchone()

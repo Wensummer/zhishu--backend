@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import init_db
-from app.routers import admin, admin_data, admin_prompts, announcements, billing, briefing, chat, copilot, enterprise, models, workbench
+from app.routers import admin, admin_data, admin_prompts, announcements, billing, briefing, chat, copilot, enterprise, models, summary, workbench
 
 
 @asynccontextmanager
@@ -39,6 +39,7 @@ app.include_router(copilot.router)
 app.include_router(chat.router)
 app.include_router(enterprise.router)
 app.include_router(admin_prompts.router)
+app.include_router(summary.router)
 
 
 @app.get("/health")
