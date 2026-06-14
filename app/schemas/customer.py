@@ -1,7 +1,7 @@
 """客户 / 用量 schema —— 镜像 lib/types 的 Customer / UsageRecord,
 以及工作台用的 FunnelStage / WorkbenchStat(原在 lib/demo/customers.ts)。
 """
-from typing import Literal
+from typing import Any, Literal
 
 from app.schemas.base import CamelModel
 from app.schemas.common import TimeSeriesPoint, Trend
@@ -24,6 +24,7 @@ class Customer(CamelModel):
     contact: str | None = None
     monthly_spend: float | None = None
     telecom_products: list[str] = []   # 其他电信业务推荐(名称列表)
+    enterprise_info: dict[str, Any] = {}  # 企查查企业画像(独立更新,独立取数)
 
 
 class FunnelStage(CamelModel):

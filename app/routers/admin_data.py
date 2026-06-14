@@ -77,6 +77,8 @@ TABLE_SCHEMA: dict[str, list[dict[str, str]]] = {
         {"col": "owner_manager_id", "label": "客户经理ID", "type": "text"},
         {"col": "contact", "label": "联系人", "type": "text"},
         {"col": "monthly_spend", "label": "月消费(元)", "type": "number"},
+        {"col": "telecom_products", "label": "其他电信产品(JSON数组)", "type": "long"},
+        {"col": "enterprise_info_json", "label": "企业画像(JSON)", "type": "long"},
     ],
     "announcements": [
         {"col": "id", "label": "ID", "type": "text"},
