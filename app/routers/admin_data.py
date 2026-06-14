@@ -24,6 +24,7 @@ MANAGED_TABLES: dict[str, str] = {
     "billing_records": "计费明细",
     "customer_usage": "用量趋势",
     "recommendations": "推荐选型",
+    "customer_health": "客户健康度",
     "copilot_sessions": "通话会话",
     "session_transcripts": "通话转写",
     "session_intents": "意图事件",
@@ -31,6 +32,7 @@ MANAGED_TABLES: dict[str, str] = {
     "dashboard_efficiency": "大屏·效率趋势",
     "dashboard_funnel": "大屏·漏斗",
     "dashboard_trust_metrics": "大屏·信任指标",
+    "recommendation_evidence": "推荐依据",
 }
 
 # 各表可编辑的字段（排除主键的编辑指引用）。
@@ -120,6 +122,14 @@ TABLE_SCHEMA: dict[str, list[dict[str, str]]] = {
         {"col": "evidence_json", "label": "证据链(JSON)", "type": "long"},
         {"col": "sort_order", "label": "排序", "type": "number"},
     ],
+    "customer_health": [
+        {"col": "customer_id", "label": "客户ID", "type": "text"},
+        {"col": "rate_limit_hits", "label": "限流次数", "type": "number"},
+        {"col": "error_count", "label": "报错次数", "type": "number"},
+        {"col": "last_active_at", "label": "最后活跃时间", "type": "text"},
+        {"col": "monthly_spend", "label": "月消费(元)", "type": "number"},
+        {"col": "updated_at", "label": "更新时间", "type": "text"},
+    ],
     "copilot_sessions": [
         {"col": "id", "label": "ID", "type": "text"},
         {"col": "customer_id", "label": "客户ID", "type": "text"},
@@ -144,6 +154,17 @@ TABLE_SCHEMA: dict[str, list[dict[str, str]]] = {
         {"col": "triggers_recommendation_id", "label": "触发推荐ID", "type": "text"},
         {"col": "triggers_script_id", "label": "触发话术ID", "type": "text"},
     ],
+    "recommendation_evidence": [
+        {"col": "id", "label": "ID", "type": "text"},
+        {"col": "customer_id", "label": "客户ID", "type": "text"},
+        {"col": "model_id", "label": "模型ID", "type": "text"},
+        {"col": "model_name", "label": "模型名称", "type": "text"},
+        {"col": "query", "label": "检索文本", "type": "text"},
+        {"col": "records_json", "label": "知识库记录(JSON)", "type": "long"},
+        {"col": "theory", "label": "理论依据", "type": "long"},
+        {"col": "created_at", "label": "创建时间", "type": "text"},
+        {"col": "updated_at", "label": "更新时间", "type": "text"},
+    ],
 }
 
 # 主键字段名
@@ -157,6 +178,7 @@ TABLE_PK: dict[str, str] = {
     "billing_records": "id",
     "customer_usage": "id",
     "recommendations": "id",
+    "customer_health": "customer_id",
     "copilot_sessions": "id",
     "session_transcripts": "rowid",
     "session_intents": "rowid",
@@ -164,6 +186,7 @@ TABLE_PK: dict[str, str] = {
     "dashboard_efficiency": "rowid",
     "dashboard_funnel": "rowid",
     "dashboard_trust_metrics": "key",
+    "recommendation_evidence": "id",
 }
 
 
@@ -177,6 +200,7 @@ TABLE_CATEGORY: dict[str, str] = {
     "billing_records": "业务数据",
     "customer_usage": "业务数据",
     "recommendations": "业务数据",
+    "customer_health": "业务数据",
     "copilot_sessions": "业务数据",
     "session_transcripts": "业务数据",
     "session_intents": "业务数据",
@@ -184,6 +208,7 @@ TABLE_CATEGORY: dict[str, str] = {
     "dashboard_efficiency": "运营大屏",
     "dashboard_funnel": "运营大屏",
     "dashboard_trust_metrics": "运营大屏",
+    "recommendation_evidence": "业务数据",
 }
 
 
@@ -800,7 +825,7 @@ function sortBy(col) {
 }
 
 function getPk() {
-  const m = {models:'id',pricing_plans:'id',customers:'id',announcements:'id',talk_scripts:'id',system_config:'key',billing_records:'id',customer_usage:'id',recommendations:'id',copilot_sessions:'id',session_transcripts:'rowid',session_intents:'rowid',dashboard_stats:'rowid',dashboard_efficiency:'rowid',dashboard_funnel:'rowid',dashboard_trust_metrics:'key'};
+  const m = {models:'id',pricing_plans:'id',customers:'id',announcements:'id',talk_scripts:'id',system_config:'key',billing_records:'id',customer_usage:'id',recommendations:'id',copilot_sessions:'id',session_transcripts:'rowid',session_intents:'rowid',dashboard_stats:'rowid',dashboard_efficiency:'rowid',dashboard_funnel:'rowid',dashboard_trust_metrics:'key',recommendation_evidence:'id'};
   return m[currentTable] || 'id';
 }
 

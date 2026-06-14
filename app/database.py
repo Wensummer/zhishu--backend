@@ -189,6 +189,35 @@ def init_db() -> None:
             triggers_recommendation_id TEXT,
             triggers_script_id TEXT
         );
+
+        -- 客户健康度表(简报的动态指标)
+        CREATE TABLE IF NOT EXISTS customer_health (
+            customer_id     TEXT PRIMARY KEY,
+            rate_limit_hits INTEGER NOT NULL DEFAULT 0,
+            error_count     INTEGER NOT NULL DEFAULT 0,
+            last_active_at  TEXT,
+            monthly_spend   REAL,
+            updated_at      TEXT NOT NULL
+        );
+
+        -- 推荐选型支撑依据持久化缓存(关联客户)
+        CREATE TABLE IF NOT EXISTS recommendation_evidence (
+            id           TEXT PRIMARY KEY,
+            customer_id  TEXT NOT NULL,
+            model_id     TEXT NOT NULL,
+            model_name   TEXT NOT NULL,
+            query        TEXT NOT NULL,
+            records_json TEXT NOT NULL,
+            theory       TEXT NOT NULL DEFAULT '',
+            created_at   TEXT NOT NULL,
+            updated_at   TEXT NOT NULL
+        );
+
+        -- 索引
+        CREATE INDEX IF NOT EXISTS idx_customer_usage_customer ON customer_usage(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_billing_customer ON billing_records(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_recommendations_customer ON recommendations(customer_id);
+        CREATE INDEX IF NOT EXISTS idx_evidence_customer ON recommendation_evidence(customer_id);
     """)
 
     # === 种子数据：仅在空库时写入 ===
@@ -478,6 +507,20 @@ def _seed(conn: sqlite3.Connection) -> None:
     # ---------- 计费明细(演示数据) ----------
     import random as _rand
     from datetime import datetime as _dt, timedelta as _td
+
+    # ---------- 客户健康度(演示数据) ----------
+    _health_data = [
+        ("c-1024", 12, 3, "2026-06-14T10:30:00", 24800.0),
+        ("c-1031", 8, 1, "2026-06-13T14:20:00", 15600.0),
+        ("c-1042", 6, 0, "2026-06-14T09:15:00", 86000.0),
+        ("c-1055", 3, 5, "2026-05-28T16:00:00", 3200.0),
+    ]
+    for cid, hits, errs, active, spend in _health_data:
+        conn.execute(
+            "INSERT OR IGNORE INTO customer_health VALUES (?,?,?,?,?,?)",
+            (cid, hits, errs, active, spend, _dt.now().isoformat())
+        )
+
     _model_names_b = [r["name"] for r in conn.execute("SELECT name FROM models").fetchall()]
     _now_b = _dt.now()
     # C 端
